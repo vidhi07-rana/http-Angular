@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 app.get("/places", async (req, res) => {
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
-  return res.status(500).json();
+  // return res.status(500).json();
   
   const fileContent = await fs.readFile("./data/places.json");
 
@@ -40,10 +40,11 @@ app.get("/user-places", async (req, res) => {
 app.put("/user-places", async (req, res) => {
   const placeId = req.body.placeId;
 
+  // return res.status(500).json()
   const fileContent = await fs.readFile("./data/places.json");
   const placesData = JSON.parse(fileContent);
 
-  const place = placesData.find((place) => place.id === placeId);
+  const place =  placesData.find((place) => place.id === placeId);
 
   const userPlacesFileContent = await fs.readFile("./data/user-places.json");
   const userPlacesData = JSON.parse(userPlacesFileContent);

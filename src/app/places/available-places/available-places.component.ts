@@ -1,9 +1,9 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Place } from '../place.model';
 import { PlacesComponent } from '../places.component';
 import { PlacesContainerComponent } from '../places-container/places-container.component';
 import { catchError, map, throwError } from 'rxjs';
+import { PlacesService } from '../places.service';
 
 @Component({
   selector: 'app-available-places',
@@ -17,35 +17,18 @@ export class AvailablePlacesComponent implements  OnInit {
   places = signal<Place[] | undefined>(undefined);
 isFetching = signal(false)
 isError = signal('')
-  private httpClient = inject(HttpClient)
+private placeService = inject(PlacesService)
 private destoryRef = inject(DestroyRef);
 
 // constructor(private httpClient : HttpClient){}
 
 ngOnInit(){
   this.isFetching.set(true)
- const subscription= this.httpClient
- .get<{places: Place[]}>('http://localhost:3000/places')
- .pipe(
-  map((resData)=> resData.places, catchError((error)=>{
-    console.log(error);
-    return throwError(()=> new Error('Something went wrong while fetching the available places. Please try again later.'))
-  }))
- )
- .subscribe({
-  // const subscription= this.httpClient.get<{places: Place[]}>('http://localhost:3000/places', {
-  //   observe:'response'
-  //  }).subscribe({
-  //     next: (response)=>{
-  //       console.log(response)
-  //       console.log(response.body?.places)
-  //     }
-  //   })  
-
+ const subscription= this.placeService.loadAvailablePlaces().subscribe({
   next: (places)=>{
 this.places.set(places)
   },
-  error:(error: Error)=>{
+  error:(error: Error )=>{
 this.isError.set(error.message)
   },
   complete:()=>{
@@ -55,5 +38,14 @@ this.isError.set(error.message)
   this.destoryRef.onDestroy(()=>{
     subscription.unsubscribe()
   })
+}
+onSelect(selectedPlace : Place ){
+  const subscription = this.placeService.addPlaceToUserPlaces(selectedPlace).subscribe({
+    next:(resData)=> console.log(resData)
+})
+
+this.destoryRef.onDestroy(()=>{
+  subscription.unsubscribe()
+})
 }
 }
