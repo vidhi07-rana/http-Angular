@@ -3,11 +3,12 @@
   <p class="fallback-text">Fetching Favorite places....</p>
     }
     @if (isError() ) {
-    }    <p class="fallback-text"> {{isError()}}</p>
+       <p class="fallback-text"> {{isError()}}</p>
+    }
   
     @if (places()) {
-    <app-places [places]="places()!" />
-    } @else if (places().length === 0) {
+    <app-places [places]="places()!" (selectPlace)="onRemovePlace($event)" />
+    } @else if (places() .length === 0) {
     <p class="fallback-text">Unfortunately, no places could be found.</p>
     }
   </app-places-container>

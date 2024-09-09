@@ -6,17 +6,19 @@ import { HttpClient } from '@angular/common/http';
 import { Place } from '../place.model';
 import { catchError, map, throwError } from 'rxjs';
 import { PlacesService } from '../places.service';
+import { ErrorModalComponent } from "../../shared/modal/error-modal/error-modal.component";
 
 @Component({
   selector: 'app-user-places',
   standalone: true,
   templateUrl: './user-places.component.html',
   styleUrl: './user-places.component.css',
-  imports: [PlacesContainerComponent, PlacesComponent],
+  imports: [PlacesContainerComponent, PlacesComponent, ErrorModalComponent],
 })
 export class UserPlacesComponent implements OnInit {
   isError = signal('')
   isFetching = signal(false);
+  
 private placeService = inject(PlacesService)
   private destoryRef = inject(DestroyRef);
   places = this.placeService.loadedUserPlaces;
@@ -48,5 +50,11 @@ private placeService = inject(PlacesService)
       subscription.unsubscribe()
     })
   }
+  onRemovePlace(place:Place){
+const Subscription= this.placeService.removeUserPlace(place).subscribe();
 
+this.destoryRef.onDestroy(()=>{
+  Subscription.unsubscribe()
+})
+  }
 }
